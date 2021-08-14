@@ -1,7 +1,17 @@
 package com.zoomalert;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
+import androidx.lifecycle.ProcessLifecycleOwner;
+
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactInstanceManager;
@@ -11,7 +21,7 @@ import com.facebook.soloader.SoLoader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-public class MainApplication extends Application implements ReactApplication {
+public class MainApplication extends Application implements ReactApplication, LifecycleObserver {
 
   private final ReactNativeHost mReactNativeHost =
       new ReactNativeHost(this) {
@@ -45,6 +55,7 @@ public class MainApplication extends Application implements ReactApplication {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
     initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+    ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
   }
 
   /**
@@ -77,4 +88,17 @@ public class MainApplication extends Application implements ReactApplication {
       }
     }
   }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    public void onAppBackgrounded() {
+        stopService(new Intent(this, HepUstte.class));
+        Log.d("MyApp", "App in background");
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    public void onAppForegrounded() {
+        Log.d("MyApp", "App in foreground");
+        startService(new Intent(this, HepUstte.class));
+    }
+
 }
