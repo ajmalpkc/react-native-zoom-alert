@@ -21,6 +21,7 @@ public class HepUstte extends Service {
     View mView;
     WindowManager windowManager;
     WindowManager.LayoutParams layoutParams;
+    private Boolean isDialogShowing;
 
     @Override
     public void onCreate() {
@@ -65,20 +66,25 @@ public class HepUstte extends Service {
     }
 
     public void showDialog() {
-        if (AndroidNative.AppConstants.isMeetingStarted) {
+        if (AndroidNative.AppConstants.isMeetingStarted && !isDialogShowing) {
             windowManager.addView(mView, layoutParams);
+            isDialogShowing = true;
         } else {
-            Toast.makeText(this, "Meeting not started", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Meeting not started or already dialog is showing", Toast.LENGTH_SHORT).show();
         }
     }
 
     public void removeDialog() {
-        windowManager.removeView(mView);
+        if (isDialogShowing) {
+            windowManager.removeView(mView);
+            isDialogShowing = false;
+        }
     }
+
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         removeDialog();
+        super.onDestroy();
     }
 }
