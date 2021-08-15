@@ -76,7 +76,10 @@ public class HepUstte extends Service {
 
     public void removeDialog() {
         if (isDialogShowing) {
-            windowManager.removeView(mView);
+            windowManager.removeViewImmediate(mView);
+            synchronized (windowManager){
+                windowManager.notify();
+            }
             isDialogShowing = false;
         }
     }
@@ -84,7 +87,7 @@ public class HepUstte extends Service {
 
     @Override
     public void onDestroy() {
-        removeDialog();
         super.onDestroy();
+        removeDialog();
     }
 }
