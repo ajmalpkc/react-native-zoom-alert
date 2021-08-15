@@ -3,8 +3,6 @@ package com.zoomalert;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Handler;
@@ -12,12 +10,12 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
+
+import ch.milosz.reactnative.AndroidNative;
 
 public class HepUstte extends Service {
     View mView;
@@ -28,11 +26,11 @@ public class HepUstte extends Service {
     public void onCreate() {
         super.onCreate();
 
-        Toast.makeText(getBaseContext(),"onCreate start Service", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "onCreate start Service", Toast.LENGTH_LONG).show();
 
         windowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
         ViewGroup valetModeWindow = (ViewGroup) View.inflate(this, R.layout.layout_hud, null);
-        layoutParams = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,  WindowManager.LayoutParams.WRAP_CONTENT,
+        layoutParams = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT,
                 Build.VERSION.SDK_INT < Build.VERSION_CODES.O ?
                         WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY :
                         WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
@@ -67,7 +65,11 @@ public class HepUstte extends Service {
     }
 
     public void showDialog() {
-        windowManager.addView(mView, layoutParams);
+        if (AndroidNative.AppConstants.isMeetingStarted) {
+            windowManager.addView(mView, layoutParams);
+        } else {
+            Toast.makeText(this, "Meeting not started", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void removeDialog() {
