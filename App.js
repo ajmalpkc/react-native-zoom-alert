@@ -20,6 +20,9 @@ import {
 
 import ZoomUs from 'react-native-zoom-us';
 
+import BackgroundService from 'react-native-background-actions';
+const sleep = time => new Promise(resolve => setTimeout(() => resolve(), time));
+
 const ZOOM_CONFIG = {
   ZOOM_PUBLIC_KEY: 'shah3TQPdYodazVsn76A6Up6mdwWmhW6Mb9v',
   ZOOM_PRIVATE_KEY: 'up1RTZrNOHatdJHI5KijERP7mDS8tCLNkjXe',
@@ -37,6 +40,35 @@ const App: () => Node = () => {
 
   const join = async (name, live) => {
     try {
+      const veryIntensiveTask = async taskDataArguments => {
+        // Example of an infinite loop task
+        const {delay} = taskDataArguments;
+        await new Promise(async resolve => {
+          for (let i = 0; BackgroundService.isRunning(); i++) {
+            console.log(i);
+            const res = await ZoomUs.getAppLifeCycle();
+            console.log('ZoomUs.getAppLifeCycle()', res);
+            await sleep(delay);
+          }
+        });
+      };
+
+      const options = {
+        taskName: 'Example',
+        taskTitle: 'ExampleTask title',
+        taskDesc: 'ExampleTask description',
+        taskIcon: {
+          name: 'ic_launcher',
+          type: 'mipmap',
+        },
+        color: '#ff00ff',
+        // linkingURI: 'yourSchemeHere://chat/jane', // See Deep Linking for more info
+        parameters: {
+          delay: 1000,
+        },
+      };
+
+      await BackgroundService.start(veryIntensiveTask, options);
       await ZoomUs.joinMeeting({
         userName: name,
         meetingNumber: live.meeting_id,
@@ -50,8 +82,11 @@ const App: () => Node = () => {
         noInvite: true,
         noShare: true,
       });
+
+      await BackgroundService.stop();
     } catch (error) {
       console.log('error', JSON.stringify(error.message));
+      await BackgroundService.stop();
       // alert(JSON.stringify(error));
       if (error.message === 'joinMeeting, errorCode=101') {
         // alert('Here');
@@ -67,6 +102,8 @@ const App: () => Node = () => {
     initializeZoom();
   }, []);
 
+  // console.log(ZoomUs);
+
   return (
     <SafeAreaView style={{flex: 1}}>
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -79,7 +116,7 @@ const App: () => Node = () => {
             backgroundColor: 'blue',
           }}
           onPress={() => {
-            join('Ajmal', {meeting_id: '94152954253', password: '5XIMY2'});
+            join('Ajmal', {meeting_id: '92430694246', password: 'NPRWTE'});
           }}>
           <Text style={{color: 'white'}}>Join</Text>
         </TouchableOpacity>
