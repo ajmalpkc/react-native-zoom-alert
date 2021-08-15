@@ -21,7 +21,7 @@ public class HepUstte extends Service {
     View mView;
     WindowManager windowManager;
     WindowManager.LayoutParams layoutParams;
-    private Boolean isDialogShowing;
+    private Boolean isDialogShowing = false;
 
     @Override
     public void onCreate() {
